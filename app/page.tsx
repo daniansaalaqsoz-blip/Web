@@ -20,17 +20,23 @@ export default function AdminDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [isActivated, setIsActivated] = useState(false);
-  const [logs, setLogs] = useState<LogEntry[]>([]);
-  const [confirmClear, setConfirmClear] = useState(false);
-
-  useEffect(() => {
-    const saved = localStorage.getItem('am_activation_logs');
-    if (saved) {
-      try {
-        setLogs(JSON.parse(saved));
-      } catch (e) {}
+  
+  // Membaca localStorage langsung saat inisialisasi state (Bebas error ESLint)
+  const [logs, setLogs] = useState<LogEntry[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('am_activation_logs');
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          return [];
+        }
+      }
     }
-  }, []);
+    return [];
+  });
+  
+  const [confirmClear, setConfirmClear] = useState(false);
 
   const addLog = (logEmail: string, logStatus: 'sent' | 'activated' | 'error', details?: string) => {
     const newLog: LogEntry = {
